@@ -38,7 +38,7 @@
   .offer .head{border-bottom:1px solid var(--ink);padding:.9rem 1.4rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--green);display:flex;justify-content:space-between}
   .offer .body{padding:clamp(2rem,6vw,3.4rem) 1.4rem;text-align:center}
   .offer .label{font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);margin:0 0 .8rem}
-  .offer .num{font-weight:500;font-size:clamp(2.6rem,10vw,5.5rem);letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;transition:opacity .2s}
+  .offer .num{font-weight:500;font-size:clamp(2.2rem,8.6vw,5.5rem);letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;transition:opacity .2s;display:block;max-width:100%}
   .offer .num.flash{opacity:.25}
   .offer .decline{margin:2rem auto 0;display:inline-block;font-family:var(--mono);font-size:1rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--paper);background:var(--green);border:0;padding:1rem 2.4rem;cursor:pointer}
   .offer .decline:hover{background:#12281f}
@@ -123,13 +123,16 @@
         count=document.getElementById('offerCount'),
         ref=document.getElementById('offerRef');
     function fmt(n){ return '$'+n.toLocaleString('en-US'); }
+    /* the number grows; the box does not. shrink the type until the digits fit. */
+    function fit(){ num.style.fontSize=''; var box=num.parentNode.clientWidth, fs=parseFloat(getComputedStyle(num).fontSize), guard=0; while(num.scrollWidth>box && fs>14 && guard++<40){ fs-=1; num.style.fontSize=fs+'px'; } }
+    window.addEventListener('resize',fit); fit();
     btn.addEventListener('click', function(){
       i++;
       num.classList.add('flash');
       setTimeout(function(){ num.classList.remove('flash'); }, 180);
       if(i < offers.length){
         setTimeout(function(){
-          num.textContent = fmt(offers[i]);
+          num.textContent = fmt(offers[i]); fit();
           ref.textContent = 'REF / '+String(i+1).padStart(3,'0');
           var lines=[
             'Higher. It always goes higher.',
@@ -143,7 +146,7 @@
         // the terminal state: the argument made physical
         setTimeout(function(){
           num.textContent = 'There is no number.';
-          num.className = 'num terminal';
+          num.className = 'num terminal'; fit();
           btn.disabled = true; btn.textContent = 'Declined';
           count.textContent = 'That is the entire argument.';
           ref.textContent = 'REF / CLOSED';
